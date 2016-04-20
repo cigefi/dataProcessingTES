@@ -47,18 +47,25 @@ function [dCO2,dH2O,dHDO,dO3,mCO2,mH2O,mHDO,mO3] = dataProcessingTES(dirName,dCO
             try
                 info = h5info(char(fileT));
                 groups = info.Groups(1).Groups(2).Groups.Groups;
-                names = extractfield(groups.Datasets,'Name');
+                if length(groups) > 1
+                    groups = groups(1);
+                end
+                names = extractfield(groups(1).Datasets,'Name');
                 var2Read = NaN;
                 for d = 1:4
                     p = findPos(char(variables(d)),names);
                     if ~isnan(p)
                         var2Read = char(names(p));
+                        break;
                     end
                 end
                 if isnan(var2Read)
                     continue;
                 end
                 varPath = char(strcat(groups.Name,'/',var2Read));
+                if isnan(varPath)
+                    error('ERROR');
+                end
                 o = double(readFile(char(fileT),varPath));
                 if ~isempty(o)
                     switch(var2Read)
@@ -99,7 +106,7 @@ function [dCO2,dH2O,dHDO,dO3,mCO2,mH2O,mHDO,mO3] = dataProcessingTES(dirName,dCO
         else
             if isequal(dirData(f).isdir,1)
                 newPath = char(path.concat(dirData(f).name));
-                [dCO2,dH2O,dHDO,dO3] = dataProcessingTES({newPath,char(save_path.concat(dirData(f).name)),char(logPath)},dCO2,dH2O,dHDO,dO3,mCO2,mH2O,mHDO,mO3);
+                [dCO2,dH2O,dHDO,dO3,mCO2,mH2O,mHDO,mO3] = dataProcessingTES({newPath,char(save_path.concat(dirData(f).name)),char(logPath)},dCO2,dH2O,dHDO,dO3,mCO2,mH2O,mHDO,mO3);
             end
         end
     end
@@ -118,11 +125,16 @@ function [pos] = findPos(key,values)
 end
 
 function [out] = isDaily(info)
-    out = 0;
-    values = extractfield(info.Groups(1).Groups(2).Groups.Attributes,'Name');
+    out = 1;
+    groups = info.Groups(1).Groups(2).Groups;
+    if length(groups) > 1
+        values = extractfield(groups(1).Attributes,'Name');
+    else
+        values = extractfield(groups.Attributes,'Name');
+    end
     for i = values
         if strcmp('MonthlyL3Algorithm',i)
-            out = 1;
+            out = 0;
             break;
         end
     end

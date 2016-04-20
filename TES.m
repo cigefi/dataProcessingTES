@@ -22,7 +22,7 @@ function [] = TES(dirName)
         %dlmwrite(strcat(char(save_path),'H2O.dat'),dH2O);
     end
     if ~isempty(dHDO)
-        save(char(strcat(save_path,'HDO-daily.mat')),'dHDO');
+        save(strcat(save_path,'HDO-daily.mat'),'dHDO');
         %dlmwrite(strcat(char(save_path),'HDO.dat'),dHDO);
     end
     if ~isempty(dO3)
