@@ -40,6 +40,9 @@ function [dCO2,dH2O,dHDO,dO3,mCO2,mH2O,mHDO,mO3] = dataProcessingTES(dirName,dCO
         logPath = logPath.concat('/');
     end
     variables = {'CO2','H2O','HDO','O3'};
+%     data = NaN(90,83,15,1,12,31);
+%     data(:,:,:,1,8,22) = ones(90,83,15);
+    cYear = 0;
     for f = 3:length(dirData)
         fileT = path.concat(dirData(f).name);
         ext = fileT.substring(fileT.lastIndexOf('.')+1);
@@ -66,6 +69,15 @@ function [dCO2,dH2O,dHDO,dO3,mCO2,mH2O,mHDO,mO3] = dataProcessingTES(dirName,dCO
                 if isnan(varPath)
                     error('ERROR');
                 end
+                if ~isDaily(info)
+                    [month,day,year] = getDate(info);
+                end
+                if cYear ~= year
+                    mCO2 = cat(4,mCO2,NaN(90,83,15,1,12,31));
+                    mH2O = cat(4,mH2O,NaN(90,83,15,1,12,31));
+                    mHDO = cat(4,mHDO,NaN(90,83,15,1,12,31));
+                    mO3 = cat(4,mO3,NaN(90,83,15,1,12,31));
+                end
                 o = double(readFile(char(fileT),varPath));
                 if ~isempty(o)
                     switch(var2Read)
@@ -73,25 +85,29 @@ function [dCO2,dH2O,dHDO,dO3,mCO2,mH2O,mHDO,mO3] = dataProcessingTES(dirName,dCO
                             if isDaily(info)
                                 dCO2 = cat(3,dCO2,o);
                             else
-                                mCO2 = cat(3,mCO2,o);
+                                mCO2(:,:,:,end,day,month) = o;
+                                %mCO2 = cat(3,mCO2,o);
                             end
                         case 'H2O'
                             if isDaily(info)
                                 dH2O = cat(3,dH2O,o);
                             else
-                                mH2O = cat(3,mH2O,o);
+                                mH2O(:,:,:,end,day,month) = o;
+                                %mH2O = cat(3,mH2O,o);
                             end
                         case 'HDO'
                             if isDaily(info)
                                 dHDO = cat(3,dHDO,o);
                             else
-                                mHDO = cat(3,mHDO,o);
+                                mHDO(:,:,:,end,day,month) = o;
+                                %mHDO = cat(3,mHDO,o);
                             end
                         case 'O3'
                             if isDaily(info)
                                 dO3 = cat(3,dO3,o);
                             else
-                                mO3 = cat(3,mO3,o);
+                                mO3(:,:,:,end,day,month) = o;
+                                %mO3 = cat(3,mO3,o);
                             end
                     end
                 end
@@ -118,6 +134,28 @@ function [pos] = findPos(key,values)
     for i = values
         if strcmp(key,i)
             pos = c;
+            break;
+        end
+        c = c + 1;
+    end
+end
+
+function [m,d,y] = getDate(info)
+    m = NaN;
+    d = NaN;
+    y = NaN;
+    c = 1;
+    att = info.Groups(1).Groups(1).Groups.Attributes;
+    for i=1:length(att)
+        switch(att(i).Name)
+            case 'GranuleMonth'
+                m = att(i).Value;
+            case 'GranuleDay'
+                d = att(i).Value;
+            case 'GranuleYear'
+                y = att(i).Value;
+        end
+        if ~isnan(m) && ~isnan(d) && ~isnan(y)
             break;
         end
         c = c + 1;
