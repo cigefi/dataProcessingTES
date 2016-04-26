@@ -85,28 +85,28 @@ function [dCO2,dH2O,dHDO,dO3,mCO2,mH2O,mHDO,mO3] = dataProcessingTES(dirName,dCO
                             if isDaily(info)
                                 dCO2 = cat(3,dCO2,o);
                             else
-                                mCO2(:,:,:,end,day,month) = o;
+                                mCO2(:,:,:,end,month,day) = o;
                                 %mCO2 = cat(3,mCO2,o);
                             end
                         case 'H2O'
                             if isDaily(info)
                                 dH2O = cat(3,dH2O,o);
                             else
-                                mH2O(:,:,:,end,day,month) = o;
+                                mH2O(:,:,:,end,month,day) = o;
                                 %mH2O = cat(3,mH2O,o);
                             end
                         case 'HDO'
                             if isDaily(info)
                                 dHDO = cat(3,dHDO,o);
                             else
-                                mHDO(:,:,:,end,day,month) = o;
+                                mHDO(:,:,:,end,month,day) = o;
                                 %mHDO = cat(3,mHDO,o);
                             end
                         case 'O3'
                             if isDaily(info)
                                 dO3 = cat(3,dO3,o);
                             else
-                                mO3(:,:,:,end,day,month) = o;
+                                mO3(:,:,:,end,month,day) = o;
                                 %mO3 = cat(3,mO3,o);
                             end
                     end
