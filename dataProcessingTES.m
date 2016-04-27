@@ -42,12 +42,13 @@ function [dCO2,dH2O,dHDO,dO3,mCO2,mH2O,mHDO,mO3] = dataProcessingTES(dirName,dCO
     variables = {'CO2','H2O','HDO','O3'};
 %     data = NaN(90,83,15,1,12,31);
 %     data(:,:,:,1,8,22) = ones(90,83,15);
-    cYear = 0;
+    year = 0;
     for f = 3:length(dirData)
         fileT = path.concat(dirData(f).name);
         ext = fileT.substring(fileT.lastIndexOf('.')+1);
         if(ext.equalsIgnoreCase('he5'))
             try
+                cYear = year;
                 info = h5info(char(fileT));
                 groups = info.Groups(1).Groups(2).Groups.Groups;
                 if length(groups) > 1
